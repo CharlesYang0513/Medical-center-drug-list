@@ -37,7 +37,7 @@ def _no_data_text(text: str) -> bool:
 
 def scrape_cmuh(page: Page, query: str) -> dict:
     """中國醫藥大學附設醫院"""
-    page.goto("https://druginfo.cmuh.org.tw/DrugNetNew/BookInfo/DrugQuery.aspx", timeout=30000)
+    page.goto("https://druginfo.cmuh.org.tw/DrugNetNew/BookInfo/DrugQuery.aspx", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.locator("input[type=text]").first
     box.fill(query)
@@ -51,7 +51,7 @@ def scrape_cmuh(page: Page, query: str) -> dict:
 
 def scrape_cch(page: Page, query: str) -> dict:
     """彰化基督教醫院"""
-    page.goto("https://www.cch.org.tw/drug.aspx", timeout=30000)
+    page.goto("https://www.cch.org.tw/drug.aspx", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.get_by_placeholder("請輸入藥品之學名、商品名、俗名...等關鍵字")
     box.scroll_into_view_if_needed()
@@ -69,7 +69,7 @@ def scrape_cgh(page: Page, query: str) -> dict:
     僅在使用者主動單次查詢時才個別請求，不做批次/高頻爬取。"""
     page.goto(
         "https://med.cgh.org.tw/unit/branch/Pharmacy/pharm/webidentify-cgh.asp",
-        timeout=30000,
+        timeout=60000,
     )
     box = page.locator("input[type=text]").first
     box.fill(query)
@@ -83,7 +83,7 @@ def scrape_cgh(page: Page, query: str) -> dict:
 
 def scrape_vghtc(page: Page, query: str) -> dict:
     """台中榮民總醫院"""
-    page.goto("https://www3.vghtc.gov.tw:8443/pharmacyHandbook/#/handbook/search", timeout=30000)
+    page.goto("https://www3.vghtc.gov.tw:8443/pharmacyHandbook/#/handbook/search", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.get_by_placeholder("藥品查詢關鍵字")
     box.fill(query)
@@ -97,7 +97,7 @@ def scrape_vghtc(page: Page, query: str) -> dict:
 
 def scrape_vghks(page: Page, query: str) -> dict:
     """高雄榮民總醫院"""
-    page.goto("https://www2.vghks.gov.tw/DIWEB/DIQuery.jsp?value(hid)=1A0", timeout=30000)
+    page.goto("https://www2.vghks.gov.tw/DIWEB/DIQuery.jsp?value(hid)=1A0", timeout=60000)
     box = page.locator("input[type=text]").first
     box.fill(query)
     page.locator("input[type=button]").first.click()
@@ -121,8 +121,8 @@ def scrape_skh(page: Page, query: str) -> dict:
 # ---------- 尚未於今日實測，依資料卡描述推測（auto_best，可能需微調）----------
 
 def scrape_ntuh(page: Page, query: str) -> dict:
-    page.goto("https://reg.ntuh.gov.tw/pharmacyoutside/QueryDrug.aspx", timeout=30000)
-    page.wait_for_timeout(3000)  # 頁面需等待 JS 完全載入
+    page.goto("https://reg.ntuh.gov.tw/pharmacyoutside/QueryDrug.aspx", timeout=60000)
+    page.wait_for_timeout(6000)  # 頁面需等待 JS 完全載入，雲端環境網路較慢，拉長等待
     box = page.get_by_placeholder("").nth(1) if False else page.locator("input[type=text]").nth(1)
     box.fill(query)
     page.locator("input[type=submit], button").nth(1).click()
@@ -134,7 +134,7 @@ def scrape_ntuh(page: Page, query: str) -> dict:
 
 
 def scrape_cgmh(page: Page, query: str) -> dict:
-    page.goto("https://www.cgmh.org.tw/tw/Services/Drug", timeout=30000)
+    page.goto("https://www.cgmh.org.tw/tw/Services/Drug", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.get_by_placeholder("請輸入關鍵字或條碼")
     box.fill(query)
@@ -147,7 +147,7 @@ def scrape_cgmh(page: Page, query: str) -> dict:
 
 
 def scrape_mmh(page: Page, query: str) -> dict:
-    page.goto("https://mcloud.mmh.org.tw/DMZDrugFormB817/DrugQuery.html", timeout=30000)
+    page.goto("https://mcloud.mmh.org.tw/DMZDrugFormB817/DrugQuery.html", timeout=60000)
     box = page.locator("input[type=text]").first
     box.fill(query)
     page.get_by_role("button", name="查詢Search").first.click()
@@ -159,7 +159,7 @@ def scrape_mmh(page: Page, query: str) -> dict:
 
 
 def scrape_femh(page: Page, query: str) -> dict:
-    page.goto("https://www.e-pharm.info/safety/drug-information/femh-formulary", timeout=30000)
+    page.goto("https://www.e-pharm.info/safety/drug-information/femh-formulary", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.get_by_placeholder("英文成分") if False else page.locator("input[type=text], input[type=search]").first
     box.fill(query)
@@ -172,7 +172,7 @@ def scrape_femh(page: Page, query: str) -> dict:
 
 
 def scrape_chimei(page: Page, query: str) -> dict:
-    page.goto("https://www.chimei.org.tw/MedQuery/search", timeout=30000)
+    page.goto("https://www.chimei.org.tw/MedQuery/search", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.locator("input[type=text], input[type=search]").first
     box.fill(query)
@@ -186,7 +186,7 @@ def scrape_chimei(page: Page, query: str) -> dict:
 
 def scrape_ncku(page: Page, query: str) -> dict:
     """成大醫院 —— 頁面待確認，先嘗試自動化，失敗則請人工查詢"""
-    page.goto("https://web.hosp.ncku.edu.tw/pharmacy/", timeout=30000)
+    page.goto("https://web.hosp.ncku.edu.tw/pharmacy/", timeout=60000)
     page.wait_for_load_state("networkidle")
     box = page.locator("input[type=text], input[type=search]").first
     box.fill(query)
