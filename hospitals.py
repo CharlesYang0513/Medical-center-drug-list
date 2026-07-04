@@ -121,11 +121,13 @@ def scrape_skh(page: Page, query: str) -> dict:
 # ---------- 尚未於今日實測，依資料卡描述推測（auto_best，可能需微調）----------
 
 def scrape_ntuh(page: Page, query: str) -> dict:
+    """台大醫院 —— 2026-07-04 使用者實測確認：用第一個「藥名查詢」欄位
+    （非「關鍵字查詢」）搜尋英文學名（如 bisoprolol）可正常回傳結果。"""
     page.goto("https://reg.ntuh.gov.tw/pharmacyoutside/QueryDrug.aspx", timeout=60000)
     page.wait_for_timeout(6000)  # 頁面需等待 JS 完全載入，雲端環境網路較慢，拉長等待
-    box = page.get_by_placeholder("").nth(1) if False else page.locator("input[type=text]").nth(1)
+    box = page.locator("input[type=text]").first  # 藥名查詢欄位
     box.fill(query)
-    page.locator("input[type=submit], button").nth(1).click()
+    page.locator("input[type=submit], button").first.click()
     page.wait_for_timeout(1500)
     text = page.inner_text("body")
     if _no_data_text(text):
@@ -159,9 +161,12 @@ def scrape_mmh(page: Page, query: str) -> dict:
 
 
 def scrape_femh(page: Page, query: str) -> dict:
+    """亞東醫院 —— 2026-07-04 使用者截圖確認：右側搜尋欄位由上到下依序是
+    「中文名稱」「英文成分」「外觀色系」，要查英文學名必須填第二個
+    （索引1）文字欄位，不是第一個，否則會查錯欄位。"""
     page.goto("https://www.e-pharm.info/safety/drug-information/femh-formulary", timeout=60000)
     page.wait_for_load_state("networkidle")
-    box = page.get_by_placeholder("英文成分") if False else page.locator("input[type=text], input[type=search]").first
+    box = page.locator("input[type=text], input[type=search]").nth(1)  # 英文成分欄位（非第一個）
     box.fill(query)
     page.get_by_role("button", name="搜尋").first.click()
     page.wait_for_timeout(1500)
@@ -200,25 +205,25 @@ def scrape_ncku(page: Page, query: str) -> dict:
 
 HOSPITALS = [
     Hospital("ntuh", "台大醫院", "https://reg.ntuh.gov.tw/pharmacyoutside/QueryDrug.aspx",
-             "auto_best", "選取器尚未完整驗證，建議先小量測試", scrape_ntuh),
+             "auto", "2026-07-04 使用者實測確認可用（藥名查詢欄位）", scrape_ntuh),
     Hospital("vghtpe", "台北榮總", "https://www7.vghtpe.gov.tw/home/index",
              "manual", "頁面有圖形驗證碼，本工具不辨識驗證碼，請自行查詢", None),
     Hospital("cgmh", "林口長庚", "https://www.cgmh.org.tw/tw/Services/Drug",
-             "auto_best", "選取器尚未完整驗證，建議先小量測試", scrape_cgmh),
+             "auto", "2026-07-04 使用者截圖確認可用", scrape_cgmh),
     Hospital("vghtc", "台中榮總", "https://www3.vghtc.gov.tw:8443/pharmacyHandbook/#/handbook/search",
              "auto", "今日已實測", scrape_vghtc),
     Hospital("ncku", "成大醫院", "https://web.hosp.ncku.edu.tw/pharmacy/",
-             "auto_best", "頁面結構待確認，若自動失敗請人工查詢", scrape_ncku),
+             "auto_best", "頁面另有圖形驗證碼欄位，本工具不填寫；目前觀察到不填也能查到結果，但若醫院之後加強驗證，查詢會直接失敗（不會嘗試繞過）", scrape_ncku),
     Hospital("vghks", "高雄榮總", "https://www2.vghks.gov.tw/DIWEB/DIQuery.jsp?value(hid)=1A0",
              "auto", "今日已實測", scrape_vghks),
     Hospital("mmh", "馬偕醫院", "https://mcloud.mmh.org.tw/DMZDrugFormB817/DrugQuery.html",
-             "auto_best", "靜態表單，成功率預期較高", scrape_mmh),
+             "auto", "2026-07-04 使用者截圖確認可用", scrape_mmh),
     Hospital("skh", "新光醫院", "https://www.skh.org.tw/skh_regis/#/register/drug",
              "manual", "「依藥名查詢」頁籤仍要求圖形驗證碼，本工具不辨識驗證碼，請自行查詢", None),
     Hospital("femh", "亞東醫院", "https://www.e-pharm.info/safety/drug-information/femh-formulary",
-             "auto_best", "選取器尚未完整驗證，建議先小量測試", scrape_femh),
+             "auto", "2026-07-04 使用者截圖確認可用（已修正欄位選錯的問題）", scrape_femh),
     Hospital("chimei", "奇美醫院", "https://www.chimei.org.tw/MedQuery/search",
-             "auto_best", "選取器尚未完整驗證，建議先小量測試", scrape_chimei),
+             "auto", "2026-07-04 使用者截圖確認可用", scrape_chimei),
     Hospital("cgh", "國泰醫院", "https://med.cgh.org.tw/unit/branch/Pharmacy/pharm/webidentify-cgh.asp",
              "auto", "今日已實測；⚠ 該站 robots.txt 限制自動爬取，僅建議單次人工觸發查詢使用", scrape_cgh),
     Hospital("cch", "彰基", "https://www.cch.org.tw/drug.aspx",
