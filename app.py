@@ -79,6 +79,8 @@ def run_query(query: str, hospital_keys: list[str]):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
+        context.set_default_timeout(60000)
+        context.set_default_navigation_timeout(60000)
 
         for i, key in enumerate(hospital_keys):
             h = HOSPITAL_BY_KEY[key]
