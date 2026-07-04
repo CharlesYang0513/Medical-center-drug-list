@@ -151,7 +151,7 @@ if results:
         return ""
 
     st.dataframe(
-        df.style.applymap(_color, subset=["查詢結果"]),
+        df.style.map(_color, subset=["查詢結果"]),
         use_container_width=True,
         hide_index=True,
     )
